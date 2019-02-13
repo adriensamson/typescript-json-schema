@@ -41,6 +41,7 @@ function getDefaultArgs() {
         uniqueNames: false,
         rejectDateType: false,
         id: "",
+        openApi: false,
     };
 }
 exports.getDefaultArgs = getDefaultArgs;
@@ -437,6 +438,7 @@ var JsonSchemaGenerator = (function () {
         var enumValues = [];
         var simpleTypes = [];
         var schemas = [];
+        var nullable = false;
         var pushSimpleType = function (type) {
             if (simpleTypes.indexOf(type) === -1) {
                 simpleTypes.push(type);
@@ -499,7 +501,13 @@ var JsonSchemaGenerator = (function () {
             }
         }
         if (simpleTypes.length > 0) {
-            schemas.push({ type: simpleTypes.length === 1 ? simpleTypes[0] : simpleTypes });
+            if (this.args.openApi) {
+                schemas.push.apply(schemas, simpleTypes.filter(function (type) { return type !== "null"; }).map(function (type) { return ({ type: type }); }));
+                nullable = simpleTypes.indexOf("null") !== -1;
+            }
+            else {
+                schemas.push({ type: simpleTypes.length === 1 ? simpleTypes[0] : simpleTypes });
+            }
         }
         if (schemas.length === 1) {
             for (var k in schemas[0]) {
@@ -510,6 +518,9 @@ var JsonSchemaGenerator = (function () {
         }
         else {
             definition[unionModifier] = schemas;
+        }
+        if (this.args.openApi && nullable) {
+            definition.nullable = true;
         }
         return definition;
     };
@@ -780,7 +791,12 @@ var JsonSchemaGenerator = (function () {
             }
         }
         if (otherAnnotations["nullable"]) {
-            makeNullable(returnedDefinition);
+            if (this.args.openApi) {
+                returnedDefinition.nullable = true;
+            }
+            else {
+                makeNullable(returnedDefinition);
+            }
         }
         return returnedDefinition;
     };

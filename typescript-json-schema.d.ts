@@ -23,6 +23,7 @@ export declare type Args = {
     uniqueNames: boolean;
     rejectDateType: boolean;
     id: string;
+    openApi: boolean;
 };
 export declare type PartialArgs = Partial<Args>;
 export declare type PrimitiveType = number | boolean | string | null;
@@ -59,6 +60,7 @@ export declare type Definition = {
         [pattern: string]: Definition;
     };
     typeof?: "function";
+    nullable?: boolean;
 };
 export declare type SymbolRef = {
     name: string;
