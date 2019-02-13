@@ -109,6 +109,7 @@ export interface Definition extends Omit<JSONSchema7, RedifinedFields> {
     };
     // openAPI additions
     nullable?: boolean;
+    example?: any;
 }
 
 export type SymbolRef = {
@@ -436,6 +437,9 @@ export class JsonSchemaGenerator {
                 otherAnnotations[doc.name] = true;
             }
         });
+        if (this.args.openApi && Array.isArray(definition.examples) && definition.examples.length > 0) {
+            definition.example = definition.examples[0];
+        }
     }
 
     private getDefinitionForRootType(propertyType: ts.Type, reffedType: ts.Symbol, definition: Definition, defaultNumberType = this.args.defaultNumberType) {
