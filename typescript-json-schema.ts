@@ -35,7 +35,8 @@ export function getDefaultArgs(): Args {
         uniqueNames: false,
         rejectDateType: false,
         id: "",
-        defaultNumberType: "number"
+        defaultNumberType: "number",
+        openApi: false,
     };
 }
 
@@ -63,6 +64,7 @@ export type Args = {
     rejectDateType: boolean;
     id: string;
     defaultNumberType: "number" | "integer";
+    openApi: boolean;
 };
 
 export type PartialArgs = Partial<Args>;
@@ -105,6 +107,8 @@ export interface Definition extends Omit<JSONSchema7, RedifinedFields> {
     definitions?: {
         [key: string]: DefinitionOrBoolean;
     };
+    // openAPI additions
+    nullable?: boolean;
 }
 
 export type SymbolRef = {
@@ -641,6 +645,7 @@ export class JsonSchemaGenerator {
         const enumValues: PrimitiveType[] = [];
         const simpleTypes: string[] = [];
         const schemas: Definition[] = [];
+        let nullable = false;
 
         const pushSimpleType = (type: string) => {
             if (simpleTypes.indexOf(type) === -1) {
@@ -705,7 +710,12 @@ export class JsonSchemaGenerator {
         }
 
         if (simpleTypes.length > 0) {
-            schemas.push({ type: simpleTypes.length === 1 ? simpleTypes[0] : simpleTypes });
+            if (this.args.openApi) {
+                schemas.push(...simpleTypes.filter(type => type !== "null").map(type => ({type})));
+                nullable = simpleTypes.indexOf("null") !== -1;
+            } else {
+                schemas.push({type: simpleTypes.length === 1 ? simpleTypes[0] : simpleTypes});
+            }
         }
 
         if (schemas.length === 1) {
@@ -716,6 +726,9 @@ export class JsonSchemaGenerator {
             }
         } else {
             definition[unionModifier] = schemas;
+        }
+        if (this.args.openApi && nullable) {
+            definition.nullable = true;
         }
         return definition;
     }
@@ -1038,7 +1051,11 @@ export class JsonSchemaGenerator {
         }
 
         if (otherAnnotations["nullable"]) {
-            makeNullable(returnedDefinition);
+            if (this.args.openApi) {
+                returnedDefinition.nullable = true;
+            } else {
+                makeNullable(returnedDefinition);
+            }
         }
 
         return returnedDefinition;
