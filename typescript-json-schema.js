@@ -235,6 +235,9 @@ var JsonSchemaGenerator = (function () {
                 otherAnnotations[doc.name] = true;
             }
         });
+        if (this.args.openApi && definition.examples && definition.examples.length > 0) {
+            definition.example = definition.examples[0];
+        }
     };
     JsonSchemaGenerator.prototype.getDefinitionForRootType = function (propertyType, reffedType, definition) {
         var _this = this;

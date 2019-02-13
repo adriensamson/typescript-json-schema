@@ -61,6 +61,7 @@ export declare type Definition = {
     };
     typeof?: "function";
     nullable?: boolean;
+    example?: any;
 };
 export declare type SymbolRef = {
     name: string;

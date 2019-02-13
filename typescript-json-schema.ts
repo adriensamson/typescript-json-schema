@@ -96,6 +96,7 @@ export type Definition = {
     typeof?: "function",
     // openAPI additions
     nullable?: boolean,
+    example?: any,
 };
 
 export type SymbolRef = {
@@ -351,7 +352,7 @@ export class JsonSchemaGenerator {
     /**
      * Parse the comments of a symbol into the definition and other annotations.
      */
-    private parseCommentsIntoDefinition(symbol: ts.Symbol, definition: {description?: string}, otherAnnotations: {}): void {
+    private parseCommentsIntoDefinition(symbol: ts.Symbol, definition: Definition, otherAnnotations: {}): void {
         if (!symbol) {
             return;
         }
@@ -375,6 +376,9 @@ export class JsonSchemaGenerator {
                 otherAnnotations[doc.name] = true;
             }
         });
+        if (this.args.openApi && definition.examples && definition.examples.length > 0) {
+            definition.example = definition.examples[0];
+        }
     }
 
     private getDefinitionForRootType(propertyType: ts.Type, reffedType: ts.Symbol, definition: Definition) {
