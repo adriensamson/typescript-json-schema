@@ -67,6 +67,7 @@ export function run() {
         rejectDateType: args.rejectDateType,
         id: args.id,
         defaultNumberType: args.defaultNumberType,
+        openApi: false,
     });
 }
 
