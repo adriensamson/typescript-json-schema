@@ -779,6 +779,7 @@ var JsonSchemaGenerator = (function () {
         var otherAnnotations = {};
         this.parseCommentsIntoDefinition(reffedType, definition, otherAnnotations);
         this.parseCommentsIntoDefinition(symbol, definition, otherAnnotations);
+        this.parseCommentsIntoDefinition(typ.aliasSymbol, definition, otherAnnotations);
         if (prop) {
             this.parseCommentsIntoDefinition(prop, returnedDefinition, otherAnnotations);
         }
